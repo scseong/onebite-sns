@@ -7,21 +7,29 @@ import {
   ResetPasswordPage,
   SignInPage,
   SignUpPage,
-} from "./pages";
-import GlobalLayout from "./components/layout/global-layout";
+} from "@/pages";
+import {
+  GlobalLayout,
+  GuestOnlyLayout,
+  MemberOnlyLayout,
+} from "@/components/layout";
 
 export default function RootRoute() {
   return (
     <Routes>
       <Route element={<GlobalLayout />}>
-        <Route path="/" element={<IndexPage />} />
-        <Route path="/sign-in" element={<SignInPage />} />
-        <Route path="/sign-up" element={<SignUpPage />} />
-        <Route path="/forget-password" element={<ForgetPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route element={<GuestOnlyLayout />}>
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
+          <Route path="/forget-password" element={<ForgetPasswordPage />} />
+        </Route>
 
-        <Route path="/post/:postId" element={<PostDetailPage />} />
-        <Route path="/profile/:userId" element={<ProfileDetailPage />} />
+        <Route element={<MemberOnlyLayout />}>
+          <Route path="/" element={<IndexPage />} />
+          <Route path="/post/:postId" element={<PostDetailPage />} />
+          <Route path="/profile/:userId" element={<ProfileDetailPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/" />} />
       </Route>
