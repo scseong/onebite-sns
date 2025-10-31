@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import useSignUp from "@/hooks/mutations/use-sign-up";
+import useSignUp from "@/hooks/mutations/auth/use-sign-up";
 import { generateErrorMessage } from "@/lib/error";
 
 export default function SignUpPage() {
