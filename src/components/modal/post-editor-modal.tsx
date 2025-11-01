@@ -12,7 +12,7 @@ import { useOpenAlertModal } from "@/store/alert-modal";
 import { useSession } from "@/store/session";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
 import { useUpdatePost } from "@/hooks/mutations/post/use-update-post";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 type Image = {
   file: File;
@@ -26,6 +26,7 @@ export default function PostEditorModal() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { showErrorToast } = useToast();
   const postEditorModal = usePostEditorModal();
   const {
     isOpen,
@@ -35,20 +36,12 @@ export default function PostEditorModal() {
 
   const { mutate: updatePost, isPending: isUpdatePostPending } = useUpdatePost({
     onSuccess: () => close(),
-    onError: (error) => {
-      toast.error("포스트 수정에 실패했습니다.", {
-        position: "top-center",
-      });
-    },
+    onError: () => showErrorToast("포스트 수정에 실패했습니다."),
   });
 
   const { mutate: createPost, isPending: isCreatePostPending } = useCreatePost({
     onSuccess: () => close(),
-    onError: (error) => {
-      toast.error("포스트 생성에 실패했습니다.", {
-        position: "top-center",
-      });
-    },
+    onError: () => showErrorToast("포스트 생성에 실패했습니다."),
   });
 
   const handleCloseModal = () => {

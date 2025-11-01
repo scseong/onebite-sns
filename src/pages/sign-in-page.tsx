@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import useSignInWithPassword from "@/hooks/mutations/auth/use-sign-in-with-password";
 import useSignInOAuth from "@/hooks/mutations/auth/use-sign-in-with-oauth";
 import { generateErrorMessage } from "@/lib/error";
@@ -11,14 +11,12 @@ import gitHubLogo from "@/assets/github-mark.svg";
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { showErrorToast } = useToast();
   const { mutate: signInWithPassword, isPending: isSignInWithPasswordPending } =
     useSignInWithPassword({
       onError: (error) => {
         const message = generateErrorMessage(error);
-        toast.error(message, {
-          position: "top-center",
-        });
-
+        showErrorToast(message);
         setPassword("");
       },
     });
@@ -26,9 +24,7 @@ export default function SignInPage() {
     useSignInOAuth({
       onError: (error) => {
         const message = generateErrorMessage(error);
-        toast.error(message, {
-          position: "top-center",
-        });
+        showErrorToast(message);
       },
     });
 

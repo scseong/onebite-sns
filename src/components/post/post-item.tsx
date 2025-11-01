@@ -4,8 +4,8 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
-import EditPostItemButton from "@/components/post/edit-post-item-button";
+import EditPostButton from "@/components/post/edit-post-button";
+import DeletePostButton from "@/components/post/delete-post-button";
 import defaultAvatar from "@/assets/default-avatar.jpg";
 import { formatTimeAgo } from "@/lib/time";
 import type { Post } from "@/types/types";
@@ -31,10 +31,8 @@ export default function PostItem(post: Post) {
         </div>
 
         <div className="text-muted-foreground flex text-sm">
-          <EditPostItemButton {...post} />
-          <Button className="cursor-pointer" variant={"ghost"}>
-            삭제
-          </Button>
+          <EditPostButton {...post} />
+          <DeletePostButton id={post.id} />
         </div>
       </div>
 

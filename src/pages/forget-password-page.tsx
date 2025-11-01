@@ -2,26 +2,23 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import useRequestPasswordResetEmail from "@/hooks/mutations/auth/use-request-password-reset-email";
-import { toast } from "sonner";
-import { generateErrorMessage } from "../lib/error";
+import { useToast } from "@/hooks/use-toast";
+import { generateErrorMessage } from "@/lib/error";
 
 export default function ForgetPasswordPage() {
   const [email, setEmail] = useState("");
+  const { showInfoToast, showErrorToast } = useToast();
   const {
     mutate: requestPasswordResetEmail,
     isPending: isRequestPasswordResetEmailPending,
   } = useRequestPasswordResetEmail({
     onSuccess: () => {
-      toast.info("인증 메일이 발송되었습니다.", {
-        position: "top-center",
-      });
+      showInfoToast("인증 메일이 발송되었습니다.");
       setEmail("");
     },
     onError: (error) => {
       const message = generateErrorMessage(error);
-      toast.error(message, {
-        position: "top-center",
-      });
+      showErrorToast(message);
       setEmail("");
     },
   });
