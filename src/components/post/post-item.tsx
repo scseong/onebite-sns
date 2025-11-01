@@ -9,10 +9,21 @@ import EditPostButton from "@/components/post/edit-post-button";
 import DeletePostButton from "@/components/post/delete-post-button";
 import { formatTimeAgo } from "@/lib/time";
 import defaultAvatar from "@/assets/default-avatar.jpg";
-import type { Post } from "@/types/types";
+import { usePostByIdData } from "@/hooks/queries/use-post-by-id-data";
+import Loader from "@/components/loader";
+import Fallback from "@/components/fallback";
 
-export default function PostItem(post: Post) {
-  const isMine = useIsMine(post.author_id);
+export default function PostItem({ postId }: { postId: number }) {
+  const {
+    data: post,
+    isPending,
+    error,
+  } = usePostByIdData({ postId, type: "FEED" });
+
+  const isMine = useIsMine(post?.author_id);
+
+  if (isPending) return <Loader />;
+  if (error) return <Fallback />;
 
   return (
     <div className="flex flex-col gap-4 border-b pb-8">
