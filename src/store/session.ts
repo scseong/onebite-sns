@@ -41,3 +41,14 @@ export const useSetSession = () => {
   const setSession = useSessionStore((store) => store.actions.setSession);
   return setSession;
 };
+
+export function useIsMine(userId: string | null | undefined) {
+  const session = useSession();
+  const currentUserId = session?.user?.id;
+
+  if (currentUserId) {
+    return userId === currentUserId;
+  }
+
+  return false;
+}

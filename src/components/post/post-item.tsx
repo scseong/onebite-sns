@@ -1,4 +1,5 @@
 import { HeartIcon, MessageCircle } from "lucide-react";
+import { useIsMine } from "@/store/session";
 import {
   Carousel,
   CarouselContent,
@@ -6,11 +7,13 @@ import {
 } from "@/components/ui/carousel";
 import EditPostButton from "@/components/post/edit-post-button";
 import DeletePostButton from "@/components/post/delete-post-button";
-import defaultAvatar from "@/assets/default-avatar.jpg";
 import { formatTimeAgo } from "@/lib/time";
+import defaultAvatar from "@/assets/default-avatar.jpg";
 import type { Post } from "@/types/types";
 
 export default function PostItem(post: Post) {
+  const isMine = useIsMine(post.author_id);
+
   return (
     <div className="flex flex-col gap-4 border-b pb-8">
       <div className="flex justify-between">
@@ -31,8 +34,12 @@ export default function PostItem(post: Post) {
         </div>
 
         <div className="text-muted-foreground flex text-sm">
-          <EditPostButton {...post} />
-          <DeletePostButton id={post.id} />
+          {isMine && (
+            <>
+              <EditPostButton {...post} />
+              <DeletePostButton id={post.id} />
+            </>
+          )}
         </div>
       </div>
 
