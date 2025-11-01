@@ -11,6 +11,7 @@ import { usePostEditorModal } from "@/store/post-editor-modal";
 import { useOpenAlertModal } from "@/store/alert-modal";
 import { useSession } from "@/store/session";
 import { useCreatePost } from "@/hooks/mutations/post/use-create-post";
+import { useUpdatePost } from "@/hooks/mutations/post/use-update-post";
 import { toast } from "sonner";
 
 type Image = {
@@ -25,8 +26,22 @@ export default function PostEditorModal() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { isOpen, close } = usePostEditorModal();
+  const postEditorModal = usePostEditorModal();
+  const {
+    isOpen,
+    actions: { close },
+  } = postEditorModal;
   const openAlertModal = useOpenAlertModal();
+
+  const { mutate: updatePost, isPending: isUpdatePostPending } = useUpdatePost({
+    onSuccess: () => close(),
+    onError: (error) => {
+      toast.error("포스트 수정에 실패했습니다.", {
+        position: "top-center",
+      });
+    },
+  });
+
   const { mutate: createPost, isPending: isCreatePostPending } = useCreatePost({
     onSuccess: () => close(),
     onError: (error) => {
@@ -50,13 +65,23 @@ export default function PostEditorModal() {
     close();
   };
 
-  const handleCreatePostClick = () => {
+  const handleSavePostClick = () => {
     if (content.trim() === "") return;
-    createPost({
-      content,
-      images: images.map((image) => image.file),
-      userId: session!.user.id,
-    });
+
+    if (!isOpen) return;
+    if (postEditorModal.type === "CREATE") {
+      createPost({
+        content,
+        images: images.map((image) => image.file),
+        userId: session!.user.id,
+      });
+    } else {
+      if (content === postEditorModal.content) return;
+      updatePost({
+        id: postEditorModal.postId,
+        content,
+      });
+    }
   };
 
   const handleSelectImages = (e: ChangeEvent<HTMLInputElement>) => {
@@ -94,10 +119,19 @@ export default function PostEditorModal() {
       images.forEach((image) => URL.revokeObjectURL(image.previewUrl));
       return;
     }
+
+    if (postEditorModal.type === "CREATE") {
+      setContent("");
+      setImages([]);
+    } else {
+      setContent(postEditorModal.content);
+      setImages([]);
+    }
+
     textareaRef.current?.focus();
-    setContent("");
-    setImages([]);
   }, [isOpen]);
+
+  const isPending = isCreatePostPending || isUpdatePostPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={handleCloseModal}>
@@ -109,7 +143,7 @@ export default function PostEditorModal() {
           placeholder="무슨 일이 있었나요?"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          disabled={isCreatePostPending}
+          disabled={isPending}
         />
         <input
           className="hidden"
@@ -119,6 +153,22 @@ export default function PostEditorModal() {
           accept="image/*"
           multiple
         />
+        {isOpen && postEditorModal.type === "EDIT" && (
+          <Carousel>
+            <CarouselContent>
+              {postEditorModal.imageUrls?.map((url) => (
+                <CarouselItem className="basis-2/5" key={url}>
+                  <div className="relative">
+                    <img
+                      className="h-full w-full rounded-sm object-cover"
+                      src={url}
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
+        )}
         {images.length > 0 && (
           <Carousel>
             <CarouselContent>
@@ -142,18 +192,21 @@ export default function PostEditorModal() {
             </CarouselContent>
           </Carousel>
         )}
+        {isOpen && postEditorModal.type === "CREATE" && (
+          <Button
+            className="cursor-pointer"
+            onClick={() => fileInputRef.current?.click()}
+            variant="outline"
+            disabled={isPending}
+          >
+            <ImageIcon />
+            이미지 추가
+          </Button>
+        )}
         <Button
           className="cursor-pointer"
-          onClick={() => fileInputRef.current?.click()}
-          variant="outline"
-        >
-          <ImageIcon />
-          이미지 추가
-        </Button>
-        <Button
-          className="cursor-pointer"
-          onClick={handleCreatePostClick}
-          disabled={isCreatePostPending}
+          onClick={handleSavePostClick}
+          disabled={isPending}
         >
           저장
         </Button>
