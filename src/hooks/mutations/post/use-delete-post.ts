@@ -19,26 +19,9 @@ export function useDeletePost(callbacks?: UseMutationCallback) {
       if (deletedPost.image_urls && deletedPost.image_urls.length > 0)
         await deleteImagesInPath(`${deletedPost.author_id}/${deletedPost.id}`);
 
-      queryClient.setQueryData<InfiniteData<number[]>>(
-        QUERY_KEYS.post.list,
-        (prev) => {
-          if (!prev)
-            throw new Error(
-              "포스트 리스트를 캐시 데이터에서 찾을 수 없습니다.",
-            );
-
-          return {
-            ...prev,
-            pages: prev.pages.map((page) => {
-              if (page.includes(deletedPost.id)) {
-                return page.filter((id) => id !== deletedPost.id);
-              }
-
-              return page;
-            }),
-          };
-        },
-      );
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.post.list,
+      });
 
       queryClient.removeQueries({
         queryKey: QUERY_KEYS.post.byId(deletedPost.id),
