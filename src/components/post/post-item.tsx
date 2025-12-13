@@ -5,13 +5,14 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { usePostByIdData } from "@/hooks/queries/use-post-by-id-data";
 import EditPostButton from "@/components/post/edit-post-button";
 import DeletePostButton from "@/components/post/delete-post-button";
-import { formatTimeAgo } from "@/lib/time";
-import defaultAvatar from "@/assets/default-avatar.jpg";
-import { usePostByIdData } from "@/hooks/queries/use-post-by-id-data";
+import LikePostButton from "@/components/post/like-post-button";
 import Loader from "@/components/loader";
 import Fallback from "@/components/fallback";
+import { formatTimeAgo } from "@/lib/time";
+import defaultAvatar from "@/assets/default-avatar.jpg";
 
 export default function PostItem({ postId }: { postId: number }) {
   const {
@@ -76,11 +77,7 @@ export default function PostItem({ postId }: { postId: number }) {
       </div>
 
       <div className="flex gap-2">
-        <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border-1 p-2 px-4 text-sm">
-          <HeartIcon className="h-4 w-4" />
-          <span>0</span>
-        </div>
-
+        <LikePostButton id={post.id} likeCount={post.like_count} />
         <div className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-xl border-1 p-2 px-4 text-sm">
           <MessageCircle className="h-4 w-4" />
           <span>댓글 달기</span>
